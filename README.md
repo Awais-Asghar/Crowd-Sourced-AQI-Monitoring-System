@@ -51,8 +51,8 @@ This project focuses on creating an IoT-powered system for monitoring air qualit
 ### 2. **Software Configuration**
    - Clone this repository:
      ```bash
-     git clone https://github.com/yourusername/iot-air-quality-monitoring.git
-     cd iot-air-quality-monitoring
+     git clone https://github.com/Awais-Asghar/IoT-Based-Air-Quality-Monitoring-System-with-Machine-Learning.git
+     cd IoT-Based-Air-Quality-Monitoring-System-with-Machine-Learning
      ```
    - Program the microcontroller using the Arduino IDE with the provided code in the `/microcontroller` folder.
 
