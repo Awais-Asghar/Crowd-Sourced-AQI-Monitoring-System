@@ -1,0 +1,313 @@
+#include <DHT11.h>
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_LiquidCrystal.h>
+#include <Adafruit_BMP280.h>
+#include <MQUnifiedsensor.h>
+
+// Pin and Sensor Definitions
+Adafruit_LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+DHT11 dht11(8); // DHT11 connected to pin 8
+Adafruit_BMP280 bmp; // BMP280 connected via I2C
+#define BMP280_ADDRESS 0x76
+#define MQ2_PIN A0
+#define MQ135_PIN A1
+#define MQ7_PIN A2
+
+// MQ-2 Configuration
+MQUnifiedsensor MQ2("Arduino UNO", 5, 10, MQ2_PIN, "MQ-2");
+#define MQ2_CLEAN_AIR_RATIO 9.83
+
+// MQ-135 Configuration
+MQUnifiedsensor MQ135("Arduino UNO", 5, 10, MQ135_PIN, "MQ-135");
+#define MQ135_CLEAN_AIR_RATIO 3.6
+
+// MQ-7 Configuration
+MQUnifiedsensor MQ7("Arduino UNO", 5, 10, MQ7_PIN, "MQ-7");
+#define MQ7_CLEAN_AIR_RATIO 27.6
+
+
+// Non-blocking timing variables
+unsigned long previousMillis = 0;
+unsigned long interval = 1000; // Delay between updates in milliseconds
+
+void setup() {
+    // Serial Monitor Initialization
+    Serial.begin(9600);
+    while (!Serial); // Wait for Serial to be ready
+    Serial.println(F("Initializing System..."));
+
+    // LCD Initialization
+    lcd.begin(16, 2);
+    lcd.print(F("Air Monitoring"));
+    lcd.setCursor(0, 1);
+    lcd.print(F("Initializing..."));
+    delay(2000);
+    lcd.clear();
+
+    // BMP280 Initialization
+    if (!bmp.begin(BMP280_ADDRESS)) {
+        Serial.println(F("BMP280 Initialization Failed! Check connections."));
+        lcd.print(F("BMP280 Error!"));
+        while (1); // Halt if BMP280 fails
+    }
+    bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,
+                    Adafruit_BMP280::SAMPLING_X2,
+                    Adafruit_BMP280::SAMPLING_X16,
+                    Adafruit_BMP280::FILTER_X16,
+                    Adafruit_BMP280::STANDBY_MS_500);
+
+    // MQ-2 Initialization and Calibration
+    MQ2.setRegressionMethod(1); // PPM = a * ratio^b
+    MQ2.init();
+    float r0 = calibrateSensor(MQ2, MQ2_CLEAN_AIR_RATIO, "MQ-2");
+    MQ2.setR0(r0);
+
+    // MQ-135 Initialization and Calibration
+    MQ135.setRegressionMethod(1);
+    MQ135.init();
+    r0 = calibrateSensor(MQ135, MQ135_CLEAN_AIR_RATIO, "MQ-135");
+    MQ135.setR0(r0);
+    
+     // MQ-7 Initialization and Calibration
+    MQ7.setRegressionMethod(1);
+    MQ7.init();
+    r0 = calibrateSensor(MQ7, MQ7_CLEAN_AIR_RATIO, "MQ-7");
+    MQ7.setR0(r0);
+
+    Serial.println(F("System Initialized!"));
+}
+
+float calibrateSensor(MQUnifiedsensor &sensor, float cleanAirRatio, const char *sensorName) {
+    Serial.print(F("Calibrating "));
+    Serial.print(sensorName);
+    Serial.println(F(", please wait..."));
+    float r0 = 0;
+    for (int i = 0; i < 10; i++) {
+        sensor.update();
+        r0 += sensor.calibrate(cleanAirRatio);
+        delay(500);
+    }
+    r0 /= 10;
+    if (isinf(r0) || r0 == 0) {
+        Serial.print(sensorName);
+        Serial.println(F(" calibration failed! Check wiring."));
+        lcd.print(F("Calibration Error!"));
+        while (1); // Halt if calibration fails
+    }
+    Serial.print(sensorName);
+    Serial.println(F(" calibration successful."));
+    return r0;
+}
+
+void loop() {
+    // Non-blocking update based on interval
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousMillis >= interval) {
+        previousMillis = currentMillis;
+
+        runBMP280();
+        runDHT11();
+        runMQ2();
+        runMQ135();
+        runMQ7();
+    }
+}
+
+void runBMP280() {
+    float temperature = bmp.readTemperature();
+    float pressure = bmp.readPressure();
+    float altitude = bmp.readAltitude(1013.25);
+    Serial.println(F("-------BMP280 & DHT11-------"));
+    Serial.print(F("Temperature: "));
+    Serial.print(temperature);
+    Serial.println(F(" *C"));
+
+    Serial.print(F("Pressure: "));
+    Serial.print(pressure);
+    Serial.println(F(" Pa"));
+
+    Serial.print(F("Altitude: "));
+    Serial.print(altitude);
+    Serial.println(F(" m"));
+
+    lcd.setCursor(0, 0);
+    lcd.print(F("Temp: "));
+    lcd.print(temperature);
+    lcd.print(F("C"));
+    lcd.setCursor(0, 1);
+    lcd.print(F("Press: "));
+    lcd.print(pressure);
+    delay(interval);
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(F("Altitude: "));
+    lcd.print(altitude);
+    lcd.print(F("m"));
+}
+
+void runDHT11() {
+    int temperature = 0, humidity = 0;
+    int result = dht11.readTemperatureHumidity(temperature, humidity);
+
+    if (result == 0) {
+        Serial.print(F("Humidity: "));
+        Serial.print(humidity);
+        Serial.println(F(" %"));
+
+        lcd.setCursor(0, 1);
+        lcd.print(F("Humidity: "));
+        lcd.print(humidity);
+        lcd.print(F("%"));
+        delay(interval);
+    } else {
+        Serial.println(DHT11::getErrorString(result));
+        lcd.setCursor(0, 0);
+        lcd.print(F("DHT11 Error!"));
+    }
+}
+
+void runMQ2() {
+    MQ2.update();
+
+      /* H2 */
+     MQ2.setA(987.99); 
+     MQ2.setB(-2.162);
+     float h2 = MQ2.readSensor();
+  
+    /* Alcohol */
+    MQ2.setA(3616.1); 
+    MQ2.setB(-2.675);
+    float alcohol = MQ2.readSensor();
+  
+    /* Propane */
+    MQ2.setA(658.71); 
+    MQ2.setB(-2.168);
+    float propane = MQ2.readSensor();
+
+    MQ2.setA(574.25);
+    MQ2.setB(-2.222);
+    float lpg = MQ2.readSensor();
+
+    Serial.println(F("*MQ2*"));
+    Serial.print(F("LPG: "));
+    Serial.print(lpg);
+    Serial.println(F(" ppm"));
+    
+    Serial.print(F("Alcohol: "));
+    Serial.print(alcohol);
+    Serial.println(F(" ppm"));
+
+    Serial.print(F("Propane: "));
+    Serial.print(propane);
+    Serial.println(F(" ppm"));
+
+    Serial.print(F("H2: "));
+    Serial.print(h2);
+    Serial.println(F(" ppm"));
+    
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(F("LPG: "));
+    lcd.print(lpg);
+    lcd.setCursor(0, 1);
+    lcd.print(F("Propane: "));
+    lcd.print(propane);
+    delay(interval);
+    
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(F("H2: "));
+    lcd.print(h2);
+    lcd.setCursor(0, 1);
+    lcd.print(F("Alcohol: "));
+    lcd.print(alcohol);
+    delay(interval);
+}
+
+void runMQ135() {
+    MQ135.update();
+
+    MQ135.setA(110.47);
+    MQ135.setB(-2.862);
+    float co2 = MQ135.readSensor();
+
+    MQ135.setA(102.2); 
+    MQ135.setB(-2.473);
+    float nh4 = MQ135.readSensor();
+
+    MQ135.setA(34.68);
+    MQ135.setB(-3.369);
+    float acetone = MQ135.readSensor();
+
+    MQ135.setA(44.947);
+    MQ135.setB(-3.445);
+    float toluene = MQ135.readSensor();
+
+    Serial.println(F("=======MQ135======="));
+    Serial.print(F("CO2: "));
+    Serial.print(co2);
+    Serial.println(F(" ppm"));
+
+    Serial.print(F("NH4: "));
+    Serial.print(nh4);
+    Serial.println(F(" ppm"));
+    
+    Serial.print(F("Acetone: "));
+    Serial.print(acetone);
+    Serial.println(F(" ppm"));
+
+    Serial.print(F("Toluene: "));
+    Serial.print(toluene);
+    Serial.println(F(" ppm"));
+    
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(F("CO2: "));
+    lcd.print(co2);
+    lcd.setCursor(0, 1);
+    lcd.print(F("NH4: "));
+    lcd.print(nh4);
+    delay(interval);
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(F("Toluene: "));
+    lcd.print(toluene);
+    lcd.setCursor(0, 1);
+    lcd.print(F("Acetone: "));
+    lcd.print(acetone);
+    delay(interval);
+}
+
+void runMQ7() { 
+
+    MQ7.update();
+
+    MQ7.setA(99.042);
+    MQ7.setB(-1.518);
+    float co = MQ7.readSensor();
+
+    MQ7.setA(60000000000000);
+    MQ7.setB(-10.54);
+    float methane = MQ7.readSensor();
+    
+    Serial.println(F("-------MQ7-------"));
+    Serial.print(F("CO: "));
+    Serial.print(co);
+    Serial.println(F(" ppm"));
+    
+    Serial.print(F("CH4: "));
+    Serial.print(methane);
+    Serial.println(F(" ppm"));
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(F("CO: "));
+    lcd.print(co);
+    lcd.setCursor(0, 1);
+    lcd.print(F("CH4: "));
+    lcd.print(methane);
+    delay(interval);
+}
