@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/88f82794-82b2-49c5-8758-7fe7f79ade32)# Crowd-Sourced AQI Monitoring System
+# Crowd-Sourced AQI Monitoring System
 
 ![Project Status](https://img.shields.io/badge/status-Completed-brightgreen.svg)
 ![Platform](https://img.shields.io/badge/platform-Arduino-blue.svg)
