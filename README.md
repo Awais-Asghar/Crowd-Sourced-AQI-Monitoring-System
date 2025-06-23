@@ -1,4 +1,4 @@
-# IoT-Based Air Quality Monitoring and AQI Measurement System
+# IoT-Based AQI Monitoring and Measurement System
 
 ## Description
 This project focuses on creating an IoT-powered system for monitoring air quality using a combination of advanced sensors and machine learning models. It collects real-time environmental data, transmits it via the HC-05 Bluetooth module, and predicts air quality indices using a custom-built mobile app. The solution is designed for urban and industrial settings to help track air quality and ensure healthier living conditions.
