@@ -1,77 +1,94 @@
-# IoT-Based AQI Monitoring and Measurement System
+# Crowd Sourced AQI Monitoring System
 
 ## Description
-This project focuses on creating an IoT-powered system for monitoring air quality using a combination of advanced sensors and machine learning models. It collects real-time environmental data, transmits it via the HC-05 Bluetooth module, and predicts air quality indices using a custom-built mobile app. The solution is designed for urban and industrial settings to help track air quality and ensure healthier living conditions.
+An IoT-based, community-driven air quality monitoring system designed to provide real-time AQI (Air Quality Index) estimation using multiple sensors. Built for both urban and rural coverage, this project empowers individuals to participate in environmental monitoring and decision-making.
 
 ---
 
-## Features
-- **Real-time Data Collection**: Monitors environmental parameters such as temperature, humidity, and pollutant levels using:
-  - **BME280**: Measures temperature, humidity, and pressure.
-  - **MQ7**: Detects carbon monoxide (CO).
-  - **MQ2**: Detects flammable gases like propane and methane.
-  - **MQ135**: Measures air quality by detecting harmful gases.
-  - **PMS5003**: Measures particulate matter (PM2.5 and PM10).
-- **Data Transmission**: Uses the HC-05 Bluetooth module for seamless serial communication.
-- **Machine Learning Predictions**: Leverages ML models in a mobile app for predicting air quality indices.
-- **User-Friendly Mobile App**: Displays real-time sensor data and provides predictions with actionable insights.
+## Overview
+This project presents a low-cost, scalable solution for air quality monitoring using IoT. It uses MQ-series gas sensors, particulate matter sensors, temperature & humidity sensors, and Bluetooth communication to calculate and visualize AQI in real-time.
+---
+
+## Hardware Used
+| Component        | Functionality               |
+| ---------------- | --------------------------- |
+| Arduino UNO      | Main microcontroller        |
+| MQ135            | CO₂, NH₃, benzene detection |
+| MQ7              | Carbon Monoxide (CO)        |
+| MQ2              | Smoke, LPG, Methane         |
+| PMS5003          | PM2.5, PM10 detection       |
+| DHT11 / DHT22    | Temperature & Humidity      |
+| BME280           | Pressure, Temp, Humidity    |
+| HC-05 Bluetooth  | Mobile communication        |
+| 16x2 LCD Display | Real-time local display     |
 
 ---
 
-## Hardware Requirements
-- **BME280** sensor
-- **MQ7** sensor
-- **MQ2** sensor
-- **MQ135** sensor
-- **PMS5003** sensor
-- **HC-05 Bluetooth module**
-- Arduino/ESP32/Raspberry Pi (for microcontroller setup)
-- Power source
+## System Design
+Sensors → Arduino → Bluetooth → Mobile App
+
+-Local output via LCD
+-Data processed & visualized for AQI
+-Crowd-sourced model: Users install devices across regions
 
 ---
 
-## Software Requirements
-- Arduino IDE or relevant microcontroller programming software
-- Python (for ML model training and testing)
-- Mobile App (developed using Flutter/React Native/other frameworks)
-- Libraries:
-  - `sklearn`
-  - `numpy`
-  - `matplotlib`
-  - `serial`
+## Working Principle
+Each pollutant’s concentration is read by the sensors. AQI is calculated using EPA-based formulae. The final AQI is determined by the maximum AQI among critical pollutants (PM2.5, PM10, CO).
+PM2.5 AQI: 212.40 (Very Unhealthy)
+PM10 AQI: 108.42
+CO AQI: 0.00
+→ Overall AQI = 212.40
+
+## Data Collection
+Sample Measurements:
+-PM2.5: 162 µg/m³
+-PM10: 170 µg/m³
+-CO2: 2.01 ppm
+-CO: 0.32 ppm
+-AQI calculated using official EPA scales.
 
 ---
 
-## Installation and Usage
-### 1. **Hardware Setup**
-   - Connect the sensors (BME280, MQ7, MQ2, MQ135, PMS5003) to the microcontroller.
-   - Attach the HC-05 module for data transfer.
-   - Power up the microcontroller.
+## Results & Analysis
+Taken on 19th December, 2024 – 10:42 PM – Islamabad
+| Parameter | Value     | AQI Value | Health Impact         |
+| --------- | --------- | --------- | --------------------- |
+| PM2.5     | 162 µg/m³ | 212.40    | Very Unhealthy        |
+| PM10      | 170 µg/m³ | 108.42    | Unhealthy (Sensitive) |
+| CO        | 0.32 ppm  | 0.00      | Good                  |
 
-### 2. **Software Configuration**
-   - Clone this repository:
-     ```bash
-     git clone https://github.com/Awais-Asghar/IoT-Based-Air-Quality-Monitoring-System-with-Machine-Learning.git
-     cd IoT-Based-Air-Quality-Monitoring-System-with-Machine-Learning
-     ```
-   - Program the microcontroller using the Arduino IDE with the provided code in the `/microcontroller` folder.
-
-### 3. **Data Processing and Prediction**
-   - Run the ML scripts in the `/ml-model` folder to preprocess and predict air quality indices.
-   - Install the mobile app from the `/app` directory to visualize the data.
-
-### 4. **Testing**
-   - Verify sensor readings on a serial monitor.
-   - Confirm data transmission to the mobile app.
+-Our AQI: 212.40
+-Accuracy: 99% vs US Embassy AQI System
 
 ---
 
-## Project Structure
-```plaintext
-iot-air-quality-monitoring/
-├── app/                  # Mobile app source code
-├── microcontroller/      # Code for sensor and Bluetooth setup
-├── ml-model/             # ML scripts for predictions
-├── data/                 # Collected datasets and preprocessing scripts
-├── docs/                 # Documentation and guides
-└── README.md             # Project overview
+## Accuracy Validation
+Compared to official U.S. Embassy AQI values.
+Real-time performance testing.
+Achieved 99% correlation for PM2.5 and PM10 values.
+
+Hardware Setup
+
+Sensor Readings (LCD + Mobile)
+
+Block Diagram
+
+Comparative Graphs
+
+AQI Visualizations
+
+
+## Future Work
+We aim to:
+-Integrate LSTM-based ML models for future AQI prediction
+-Enhance sensor calibration
+-Add GPS tagging for geo-based AQI mapping
+-Build a centralized web dashboard for user-friendly analysis
+
+
+## Contributors
+-Awais Asghar
+-Muhammad Hammad Sarwar
+-Muhammad Ashar Javid
+-School of Electrical Engineering & Computer Science, NUST
