@@ -80,7 +80,7 @@ In this project:
 ![Image](https://github.com/user-attachments/assets/983c8604-e113-4f46-9f29-8489a401c369)
 
 ## System Design 
-My Crowd-Sourced AQI Monitoring System is designed using IoT architecture with low-cost, easily available hardware components. It consists of:
+My Crowd-Sourced AQI Monitoring System is designed using IoT architecture with low-cost, easily available hardware components. It consists of: 
 
 ### 1. Sensor Unit
 - Gas Sensors: MQ135, MQ7, MQ2 – detect CO₂, NH₃, CO, smoke, etc.
@@ -137,7 +137,7 @@ The system's output was compared with official AQI data from the US Embassy in I
 | PM2.5     | 162 µg/m³     | 212.5     | Very Unhealthy      |
 | PM10      | 170 µg/m³     | 108.4     | Unhealthy (Sensitive Groups) |
 | CO        | 0.32 ppm      | 3.6       | Good                |
-| **Overall AQI** | —           | **212.4** | **Very Unhealthy**  |
+| **Overall AQI** | —          | **212.4** | **Very Unhealthy**  |
 
 ![Image](https://github.com/user-attachments/assets/d07f7d54-c0f8-45a5-a543-74eb7523c05b)
 
@@ -179,4 +179,4 @@ Taken on 19th December, 2024 – 10:42 PM – Islamabad
 - Awais Asghar  
 - Muhammad Hammad Sarwar  
 - Muhammad Ashar Javid  
-- School of Electrical Engineering & Computer Science, NUST  
+- School of Electrical Engineering & Computer Science (SEECS), NUST  
