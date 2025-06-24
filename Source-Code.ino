@@ -35,7 +35,7 @@ unsigned long interval = 1000; // Delay between updates in milliseconds
 
 void setup() {
     // Serial Monitor Initialization
-    Serial.begin(9600);
+    Serial.begin(9600);  // Serial Monitor
     pmsSerial.begin(9600);
     while (!Serial); // Wait for Serial to be ready
     Serial.println(F("Initializing System..."));
