@@ -1,10 +1,11 @@
 # Crowd-Sourced AQI Monitoring System
 
 ![Project Status](https://img.shields.io/badge/status-Completed-brightgreen.svg)
-![Platform](https://img.shields.io/badge/platform-Arduino-blue.svg)
-![Tool](https://img.shields.io/badge/tool-Arduino%20IDE-lightgrey.svg)
-![Communication](https://img.shields.io/badge/Bluetooth-HC--05-blue.svg)
+![Platform](https://img.shields.io/badge/platform-Arduino-orange.svg)
+![Tool](https://img.shields.io/badge/tool-Arduino%20IDE-violet.svg)
+![Communication](https://img.shields.io/badge/Bluetooth-HC--05-pink.svg)
 ![Simulation](https://img.shields.io/badge/simulation-Real%20Environment-yellow.svg)
+![License](https://img.shields.io/badge/license-MIT-lightgrey.svg)
 
 ## Description
 An IoT-based, community-driven air quality monitoring system designed to provide real-time AQI (Air Quality Index) estimation using multiple sensors. Built for both urban and rural coverage, this project empowers individuals to participate in environmental monitoring and decision-making.
